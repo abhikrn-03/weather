@@ -1,8 +1,21 @@
-const request = require('request');
+const geocode = require('./utils/geocode');
+const forecast = require('./utils/forecast');
 
-const url = "http://api.weatherstack.com/current?access_key=a014821cc123fe108447e850d67bec6e&query=jamshedpur";
+const address = process.argv[2];
 
-request({ url: url}, (error, response) => {
-    const data = JSON.parse(response.body);
-    console.log(data.current.pressure);
-});
+if (!address){
+    console.log('Please provide a location');
+} else {
+    geocode(address, (error, {latitude, longitude, location} = {} ) => {
+        if (error){
+            return console.log('Error', error);
+        }
+        forecast(latitude, longitude, (error, forecastData) => {
+            if (error){
+                return console.log('Error', error);
+            }
+            console.log(location);
+            console.log(forecastData);
+        });
+    });
+}
